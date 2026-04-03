@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Fibonacci Cipher — AL II:76 — Complete Visual Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--ink:#2C2418;--scar:#7A1F1F;--gold:#8B7332;--goldL:#C4A45A;--goldF:#D4C49A;--purp:#5B3A7A;--cyan:#2A8A8A;--ivory:#FAF6EE;--cream:#F3EDE0;--ash:#7A6F65;--rule:#D4C9B0;--bg2:#EDE8DC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ivory);color:var(--ink);font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased}
+.container{max-width:920px;margin:0 auto;padding:40px 24px 60px}
+h1{font-family:'Cinzel',serif;font-size:22px;text-align:center;color:var(--ink);letter-spacing:3px;margin-bottom:4px}
+.subtitle{font-family:'Cinzel',serif;font-size:11px;text-align:center;color:var(--gold);letter-spacing:4px;margin-bottom:32px}
+.divider{text-align:center;color:var(--goldF);letter-spacing:10px;margin:32px 0;font-size:14px}
+
+/* CIPHER DISPLAY */
+.cipher-strip{text-align:center;margin:24px 0 32px;padding:16px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--cream)}
+.cipher-strip .elements{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:2px;color:var(--ink);line-height:2}
+.cipher-strip .num{color:var(--scar);font-weight:600}
+.cipher-strip .let{color:var(--purp);font-weight:600}
+.cipher-strip .x-mark{color:var(--gold);font-weight:700;font-size:15px}
+
+/* SECTION */
+.section{margin:24px 0;padding:20px 24px;border-radius:8px;background:#fff;border:1px solid var(--rule)}
+.section-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--purp);margin-bottom:12px}
+.section p{font-size:16px;line-height:1.7;margin-bottom:10px;color:var(--ink)}
+.section .note{font-size:14px;color:var(--ash);font-style:italic}
+
+/* PIPELINE */
+.pipeline{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:16px 0}
+.pipe-box{padding:8px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;text-align:center;min-width:60px}
+.pipe-input{background:var(--cream);border:1px solid var(--rule);color:var(--scar)}
+.pipe-step{background:#fff;border:1px dashed var(--rule);color:var(--ash);font-family:'EB Garamond',serif;font-style:italic;font-size:14px}
+.pipe-output{background:var(--purp);color:#fff;font-weight:600}
+.pipe-arrow{color:var(--goldL);font-size:18px;font-weight:700}
+
+/* TABLE */
+.decode-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+.decode-table th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold);text-align:center;padding:8px 4px;border-bottom:2px solid var(--rule);font-weight:600}
+.decode-table td{text-align:center;padding:6px 4px;border-bottom:1px solid #eee;font-family:'JetBrains Mono',monospace;font-size:12px}
+.decode-table tr:nth-child(even){background:var(--cream)}
+.decode-table .col-elem{color:var(--ink);font-weight:600}
+.decode-table .col-type{color:var(--ash);font-family:'EB Garamond',serif;font-style:italic;font-size:12px}
+.decode-table .col-fib{color:var(--scar)}
+.decode-table .col-mod{color:var(--ink)}
+.decode-table .col-heb{color:var(--purp);font-weight:700;font-family:Arial,sans-serif;font-size:14px}
+.decode-table .col-val{color:var(--ash);font-size:11px}
+.decode-table .col-mk{color:var(--goldL);font-weight:600}
+.decode-table .x-row{background:#FFF8E7}
+
+/* RESULT */
+.result{text-align:center;margin:24px 0;padding:20px;border:2px solid var(--purp);border-radius:8px;background:linear-gradient(135deg,#FAF6EE,#F0EBE0)}
+.result .big-num{font-family:'Cinzel',serif;font-size:42px;font-weight:700;color:var(--purp)}
+.result .label{font-family:'Cinzel',serif;font-size:12px;letter-spacing:4px;color:var(--gold);margin-top:4px}
+.result .sub-label{font-size:15px;color:var(--ash);margin-top:6px;font-style:italic}
+.two-results{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.two-results .result{flex:1;min-width:200px}
+
+/* DIAGRAM SECTION */
+.diagram-section{margin:32px 0;padding:28px 24px;border-radius:10px;background:#1a1a24;border:1px solid #333;color:#e0ddd4}
+.diagram-section .section-title{color:var(--goldL)}
+.diagram-section p{color:#c8c4b8;font-size:15px;line-height:1.7;margin-bottom:10px}
+.diagram-section .note{color:#888;font-size:13px}
+.diagram-dark-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--goldL);text-align:center;margin-bottom:16px}
+
+/* SVG containers */
+.svg-wrap{display:flex;justify-content:center;margin:20px 0}
+.svg-wrap svg{max-width:100%}
+
+.footer{text-align:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--rule)}
+.footer p{font-size:14px;color:var(--ash);font-style:italic}
+
+@media(max-width:600px){
+  .container{padding:24px 14px}
+  .pipeline{flex-direction:column}
+  .decode-table{font-size:11px}
+  .decode-table td,.decode-table th{padding:4px 2px}
+  .diagram-section{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>THE FIBONACCI CIPHER</h1>
+<div class="subtitle">LIBER AL VEL LEGIS II:76 · COMPLETE VISUAL GUIDE</div>
+
+<!-- CIPHER -->
+<div class="cipher-strip">
+<div class="elements">
+<span class="num">4</span> <span class="num">6</span> <span class="num">3</span> <span class="num">8</span>
+<span class="let">A</span> <span class="let">B</span> <span class="let">K</span>
+<span class="num">2</span> <span class="num">4</span>
+<span class="let">A</span> <span class="let">L</span> <span class="let">G</span> <span class="let">M</span> <span class="let">O</span> <span class="let">R</span>
+<span class="num">3</span>
+<span class="let">Y</span>
+<span class="x-mark">X</span>
+<span class="num">24</span> <span class="num">89</span>
+<span class="let">R</span> <span class="let">P</span> <span class="let">S</span> <span class="let">T</span> <span class="let">O</span> <span class="let">V</span> <span class="let">A</span> <span class="let">L</span>
+</div>
+<p style="font-size:13px;color:var(--ash);margin-top:8px">28 elements · <span style="color:var(--scar)">9 numbers</span> · <span style="color:var(--purp)">18 letters</span> · <span style="color:var(--gold)">1 marker (X)</span></p>
+</div>
+
+<!-- STEP 1 -->
+<div class="section">
+<div class="section-title">STEP 1 — NUMBERS → FIBONACCI INDEX → MOD 22 → HEBREW</div>
+<p>Each number is treated as a <strong>position</strong> in the Fibonacci sequence. Look up the Fibonacci value at that position, then take mod 22 to map onto one of the 22 Hebrew letters.</p>
+<div class="pipeline">
+  <div class="pipe-box pipe-input">8</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-step">F(8) = 21</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-step">21 mod 22 = 21</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-output">ש Shin</div>
+</div>
+<p class="note">F(1)=1, F(2)=1, F(3)=2, F(4)=3, F(5)=5, F(6)=8, F(7)=13, F(8)=21, F(9)=34, F(10)=55, F(11)=89 …</p>
+</div>
+
+<!-- STEP 2 -->
+<div class="section">
+<div class="section-title">STEP 2 — ENGLISH LETTERS → GOLDEN DAWN → HEBREW</div>
+<p>Each English letter maps to Hebrew via the Golden Dawn correspondence table — the same system Crowley used throughout his magical career.</p>
+<div class="pipeline">
+  <div class="pipe-box pipe-input">A</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-step">Golden Dawn</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-output">א Alef</div>
+</div>
+<p class="note">A=Alef, B=Bet, G=Gimel, K=Kaf, L=Lamed, M=Mem, O=Ayin, P=Pe, R=Resh, S=Samekh, T=Tav, V=Vav, Y=Yod</p>
+</div>
+
+<!-- STEP 3: X -->
+<div class="section">
+<div class="section-title">STEP 3 — X IS THE FORK</div>
+<p>X is the structural marker — the crosshair, the fork point. The cipher splits here. Skip X, or include it. Both paths produce a meaningful result.</p>
+<p style="margin-top:8px"><strong>When included,</strong> X is the 24th letter of the English alphabet:</p>
+<div class="pipeline">
+  <div class="pipe-box pipe-input">X = 24th letter</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-step">24 mod 22 = 2</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-output">ב Bet = 2</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-input" style="background:#FFF8E7;border:2px solid var(--gold);color:var(--gold);font-weight:700">Katan: 2</div>
+</div>
+<p style="margin-top:10px"><strong>Skip X:</strong> sum of 27 values = <strong>91</strong> = Amen &nbsp;|&nbsp; <strong>Include X:</strong> 91 + 2 = <strong>93</strong> = Thelema</p>
+</div>
+
+<!-- STEP 4 -->
+<div class="section">
+<div class="section-title">STEP 4 — MISPAR KATAN (SMALL NUMBER REDUCTION)</div>
+<p>Each Hebrew letter's value is reduced to its <strong>root digit</strong>. Hundreds become their leading digit, tens become their leading digit. Traditional kabbalistic reduction.</p>
+<div class="pipeline">
+  <div class="pipe-box pipe-output" style="background:var(--purp)">ש Shin = 300</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-step">300 → 3</div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-box pipe-input" style="background:#fff;border:2px solid var(--scar)">3</div>
+</div>
+<p class="note">Alef(1)→1 · Bet(2)→2 · Gimel(3)→3 · Kaf(20)→2 · Lamed(30)→3 · Ayin(70)→7 · Resh(200)→2 · Shin(300)→3 · Tav(400)→4</p>
+</div>
+
+<div class="divider">✦ · ✧ · ✦</div>
+
+<!-- ===== KEYSTONE SINGULARITY ===== -->
+<div class="diagram-section">
+<div class="diagram-dark-label">DIAGRAM 1: THE KEYSTONE SINGULARITY — 89</div>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 700 540" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+  <rect width="700" height="540" fill="#1a1a24" rx="8"/>
+  
+  <!-- ======= PATH A: LEFT — FIBONACCI INDEX ======= -->
+  <text x="140" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C4A45A" letter-spacing="3">PATH A: FIBONACCI INDEX</text>
+  
+  <!-- Fibonacci sequence cascade -->
+  <g font-family="JetBrains Mono,monospace" font-size="11" fill="#555">
+    <text x="55" y="60">F(1) = 1</text>
+    <text x="55" y="78">F(2) = 1</text>
+    <text x="55" y="96">F(3) = 2</text>
+    <text x="55" y="114">F(4) = 3</text>
+    <text x="55" y="132">F(5) = 5</text>
+    <text x="55" y="150">F(6) = 8</text>
+    <text x="55" y="168">F(7) = 13</text>
+    <text x="55" y="186">F(8) = 21</text>
+    <text x="55" y="204">F(9) = 34</text>
+    <text x="55" y="222">F(10) = 55</text>
+    <text x="55" y="240" fill="#C4A45A" font-weight="600">F(11) = 89</text>
+  </g>
+  
+  <!-- Connecting line down from sequence -->
+  <line x1="120" y1="248" x2="120" y2="272" stroke="#C4A45A" stroke-width="1" opacity="0.5"/>
+  
+  <!-- F(89) mod 22 box -->
+  <rect x="55" y="275" width="130" height="30" rx="4" fill="none" stroke="#C4A45A" stroke-width="1"/>
+  <text x="120" y="295" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#C4A45A">F(89) mod 22</text>
+  
+  <!-- Arrow to center result -->
+  <line x1="185" y1="290" x2="280" y2="350" stroke="#C4A45A" stroke-width="1.5" opacity="0.6"/>
+  <polygon points="278,345 285,352 275,355" fill="#C4A45A" opacity="0.6"/>
+  
+  <!-- = 1 label on arrow -->
+  <text x="220" y="310" font-family="Cinzel,serif" font-size="16" fill="#C4A45A" font-weight="700" transform="rotate(-18, 220, 310)">= 1</text>
+
+
+  <!-- ======= PATH B: RIGHT — DIRECT MOD ======= -->
+  <text x="560" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#7A1F1F" letter-spacing="3">PATH B: DIRECT MOD</text>
+  
+  <!-- Large 89 -->
+  <rect x="505" y="100" width="110" height="70" rx="8" fill="none" stroke="#7A1F1F" stroke-width="2"/>
+  <text x="560" y="148" text-anchor="middle" font-family="Cinzel,serif" font-size="40" fill="#7A1F1F" font-weight="700">89</text>
+  
+  <!-- Connecting line down -->
+  <line x1="560" y1="170" x2="560" y2="220" stroke="#7A1F1F" stroke-width="1" opacity="0.5"/>
+  
+  <!-- mod 22 box -->
+  <rect x="495" y="225" width="130" height="30" rx="4" fill="none" stroke="#7A1F1F" stroke-width="1"/>
+  <text x="560" y="245" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7A1F1F">89 mod 22</text>
+  
+  <!-- Arrow to center result -->
+  <line x1="495" y1="240" x2="420" y2="350" stroke="#7A1F1F" stroke-width="1.5" opacity="0.6"/>
+  <polygon points="422,345 415,352 425,355" fill="#7A1F1F" opacity="0.6"/>
+  
+  <!-- = 1 label on arrow -->
+  <text x="475" y="290" font-family="Cinzel,serif" font-size="16" fill="#7A1F1F" font-weight="700" transform="rotate(22, 475, 290)">= 1</text>
+
+
+  <!-- ======= CENTER: CONVERGENCE ======= -->
+  
+  <!-- Outer glow rings -->
+  <circle cx="350" cy="370" r="65" fill="none" stroke="#C4A45A" stroke-width="0.5" opacity="0.15"/>
+  <circle cx="350" cy="370" r="50" fill="none" stroke="#C4A45A" stroke-width="0.5" opacity="0.25"/>
+  
+  <!-- The two 1s -->
+  <text x="322" y="365" font-family="Cinzel,serif" font-size="48" fill="#C4A45A" font-weight="700" opacity="0.7">1</text>
+  <text x="358" y="365" font-family="Cinzel,serif" font-size="48" fill="#C4A45A" font-weight="700" opacity="0.7">1</text>
+  
+  <!-- X crossing lines through the 1s -->
+  <line x1="325" y1="330" x2="380" y2="385" stroke="#C4A45A" stroke-width="2.5" opacity="0.4"/>
+  <line x1="380" y1="330" x2="325" y2="385" stroke="#C4A45A" stroke-width="2.5" opacity="0.4"/>
+  
+  <!-- Label: THE CROSSED ONES -->
+  <text x="350" y="410" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#888" letter-spacing="3">THE CROSSED ONES (X)</text>
+
+  <!-- Arrow down to Alef -->
+  <line x1="350" y1="420" x2="350" y2="448" stroke="#5B3A7A" stroke-width="1.5"/>
+  <polygon points="345,446 350,454 355,446" fill="#5B3A7A"/>
+
+  <!-- ALEF result box -->
+  <rect x="290" y="458" width="120" height="44" rx="8" fill="#5B3A7A"/>
+  <text x="332" y="487" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" fill="#fff" font-weight="700">א</text>
+  <text x="370" y="485" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#ddd">= 1</text>
+  
+  <!-- THE SILENT LETTER label -->
+  <text x="350" y="520" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#5B3A7A" letter-spacing="3">ALEF · THE SILENT LETTER</text>
+
+
+  <!-- ======= 1/89 GENERATOR — top center ======= -->
+  <rect x="245" y="80" width="210" height="75" rx="6" fill="#1e1e2e" stroke="#333" stroke-width="1"/>
+  <text x="350" y="102" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#C4A45A" font-weight="600">1/89 = 0.011235955...</text>
+  <line x1="270" y1="112" x2="430" y2="112" stroke="#333" stroke-width="0.5"/>
+  <text x="350" y="130" text-anchor="middle" font-family="EB Garamond,serif" font-size="13" fill="#999" font-style="italic">The Fibonacci sequence</text>
+  <text x="350" y="147" text-anchor="middle" font-family="EB Garamond,serif" font-size="13" fill="#999" font-style="italic">generated by its own reciprocal</text>
+
+  <!-- Thin connecting line from 1/89 box to convergence -->
+  <line x1="350" y1="155" x2="350" y2="310" stroke="#444" stroke-width="0.5" stroke-dasharray="3,4"/>
+
+
+  <!-- ======= VALIDATION BAR ======= -->
+  <rect x="100" y="530" width="500" height="1" fill="#333"/>
+</svg>
+</div>
+
+<p style="text-align:center;font-size:14px;color:#888;margin-top:8px"><strong style="color:#C4A45A">Validation:</strong> Both algebraic paths yield 1. The generator and the letter are one.<br>1/89 produces the Fibonacci sequence. Both mods produce Alef. The seed contains the forest.</p>
+</div>
+
+<div class="divider">✦ · ✧ · ✦</div>
+
+<!-- ===== FULL DECODE TABLE ===== -->
+<div class="section">
+<div class="section-title">COMPLETE DECRYPTION TABLE</div>
+<table class="decode-table">
+<thead><tr>
+<th>ELEM</th><th>TYPE</th><th>F(n) or GD</th><th>MOD 22</th><th>HEB</th><th>VAL</th><th>KATAN</th>
+</tr></thead>
+<tbody>
+<tr><td class="col-elem">4</td><td class="col-type">num</td><td class="col-fib">F(4)=3</td><td class="col-mod">3</td><td class="col-heb">ג</td><td class="col-val">3</td><td class="col-mk">3</td></tr>
+<tr><td class="col-elem">6</td><td class="col-type">num</td><td class="col-fib">F(6)=8</td><td class="col-mod">8</td><td class="col-heb">ח</td><td class="col-val">8</td><td class="col-mk">8</td></tr>
+<tr><td class="col-elem">3</td><td class="col-type">num</td><td class="col-fib">F(3)=2</td><td class="col-mod">2</td><td class="col-heb">ב</td><td class="col-val">2</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">8</td><td class="col-type">num</td><td class="col-fib">F(8)=21</td><td class="col-mod">21</td><td class="col-heb">ש</td><td class="col-val">300</td><td class="col-mk">3</td></tr>
+<tr><td class="col-elem">A</td><td class="col-type">letter</td><td class="col-fib">GD→Alef</td><td class="col-mod">1</td><td class="col-heb">א</td><td class="col-val">1</td><td class="col-mk">1</td></tr>
+<tr><td class="col-elem">B</td><td class="col-type">letter</td><td class="col-fib">GD→Bet</td><td class="col-mod">2</td><td class="col-heb">ב</td><td class="col-val">2</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">K</td><td class="col-type">letter</td><td class="col-fib">GD→Kaf</td><td class="col-mod">11</td><td class="col-heb">כ</td><td class="col-val">20</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">2</td><td class="col-type">num</td><td class="col-fib">F(2)=1</td><td class="col-mod">1</td><td class="col-heb">א</td><td class="col-val">1</td><td class="col-mk">1</td></tr>
+<tr><td class="col-elem">4</td><td class="col-type">num</td><td class="col-fib">F(4)=3</td><td class="col-mod">3</td><td class="col-heb">ג</td><td class="col-val">3</td><td class="col-mk">3</td></tr>
+<tr><td class="col-elem">A</td><td class="col-type">letter</td><td class="col-fib">GD→Alef</td><td class="col-mod">1</td><td class="col-heb">א</td><td class="col-val">1</td><td class="col-mk">1</td></tr>
+<tr><td class="col-elem">L</td><td class="col-type">letter</td><td class="col-fib">GD→Lamed</td><td class="col-mod">12</td><td class="col-heb">ל</td><td class="col-val">30</td><td class="col-mk">3</td></tr>
+<tr><td class="col-elem">G</td><td class="col-type">letter</td><td class="col-fib">GD→Gimel</td><td class="col-mod">3</td><td class="col-heb">ג</td><td class="col-val">3</td><td class="col-mk">3</td></tr>
+<tr><td class="col-elem">M</td><td class="col-type">letter</td><td class="col-fib">GD→Mem</td><td class="col-mod">13</td><td class="col-heb">מ</td><td class="col-val">40</td><td class="col-mk">4</td></tr>
+<tr><td class="col-elem">O</td><td class="col-type">letter</td><td class="col-fib">GD→Ayin</td><td class="col-mod">16</td><td class="col-heb">ע</td><td class="col-val">70</td><td class="col-mk">7</td></tr>
+<tr><td class="col-elem">R</td><td class="col-type">letter</td><td class="col-fib">GD→Resh</td><td class="col-mod">20</td><td class="col-heb">ר</td><td class="col-val">200</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">3</td><td class="col-type">num</td><td class="col-fib">F(3)=2</td><td class="col-mod">2</td><td class="col-heb">ב</td><td class="col-val">2</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">Y</td><td class="col-type">letter</td><td class="col-fib">GD→Yod</td><td class="col-mod">10</td><td class="col-heb">י</td><td class="col-val">10</td><td class="col-mk">1</td></tr>
+<tr class="x-row"><td class="col-elem" style="color:var(--gold);font-size:15px;font-weight:700">X</td><td class="col-type" style="color:var(--gold)">fork</td><td class="col-fib" style="color:var(--gold)">24th letter</td><td class="col-mod" style="color:var(--gold)">24%22=2</td><td class="col-heb" style="color:var(--gold)">ב</td><td class="col-val" style="color:var(--gold)">2</td><td class="col-mk" style="color:var(--gold);font-weight:700">2</td></tr>
+<tr><td class="col-elem">24</td><td class="col-type">num</td><td class="col-fib">F(24)=46368</td><td class="col-mod">46368%22=8</td><td class="col-heb">ח</td><td class="col-val">8</td><td class="col-mk">8</td></tr>
+<tr><td class="col-elem">89</td><td class="col-type">num</td><td class="col-fib">F(89)≡1</td><td class="col-mod">1</td><td class="col-heb">א</td><td class="col-val">1</td><td class="col-mk">1</td></tr>
+<tr><td class="col-elem">R</td><td class="col-type">letter</td><td class="col-fib">GD→Resh</td><td class="col-mod">20</td><td class="col-heb">ר</td><td class="col-val">200</td><td class="col-mk">2</td></tr>
+<tr><td class="col-elem">P</td><td class="col-type">letter</td><td class="col-fib">GD→Pe</td><td class="col-mod">17</td><td class="col-heb">פ</td><td class="col-val">80</td><td class="col-mk">8</td></tr>
+<tr><td class="col-elem">S</td><td class="col-type">letter</td><td class="col-fib">GD→Samekh</td><td class="col-mod">15</td><td class="col-heb">ס</td><td class="col-val">60</td><td class="col-mk">6</td></tr>
+<tr><td class="col-elem">T</td><td class="col-type">letter</td><td class="col-fib">GD→Tav</td><td class="col-mod">22</td><td class="col-heb">ת</td><td class="col-val">400</td><td class="col-mk">4</td></tr>
+<tr><td class="col-elem">O</td><td class="col-type">letter</td><td class="col-fib">GD→Ayin</td><td class="col-mod">16</td><td class="col-heb">ע</td><td class="col-val">70</td><td class="col-mk">7</td></tr>
+<tr><td class="col-elem">V</td><td class="col-type">letter</td><td class="col-fib">GD→Vav</td><td class="col-mod">6</td><td class="col-heb">ו</td><td class="col-val">6</td><td class="col-mk">6</td></tr>
+<tr><td class="col-elem">A</td><td class="col-type">letter</td><td class="col-fib">GD→Alef</td><td class="col-mod">1</td><td class="col-heb">א</td><td class="col-val">1</td><td class="col-mk">1</td></tr>
+<tr><td class="col-elem">L</td><td class="col-type">letter</td><td class="col-fib">GD→Lamed</td><td class="col-mod">12</td><td class="col-heb">ל</td><td class="col-val">30</td><td class="col-mk">3</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- RESULTS -->
+<div class="two-results">
+<div class="result">
+<div class="label">SKIP X</div>
+<div class="big-num">91</div>
+<div class="sub-label">= אמן = Amen</div>
+</div>
+<div class="result">
+<div class="label">INCLUDE X (+2)</div>
+<div class="big-num">93</div>
+<div class="sub-label">= Θελημα = Thelema</div>
+</div>
+</div>
+
+<div class="result" style="margin-top:16px;border-color:var(--scar)">
+<div class="label" style="color:var(--scar)">WRITTEN FORM — NUN SOFIT = 700</div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ash);margin:8px 0">Alef (1) + Mem (40) + Nun sofit (700)</div>
+<div class="big-num" style="color:var(--scar)">741</div>
+<div class="sub-label">= LUCIFER</div>
+</div>
+
+<div class="divider">✦ · ✧ · ✦</div>
+
+<!-- ===== THREE PYRAMIDS ===== -->
+<div class="diagram-section">
+<div class="diagram-dark-label">DIAGRAM 2: THE THREE PYRAMIDS — CONSECUTIVE TRIANGULAR SUCCESSION</div>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 700 520" xmlns="http://www.w3.org/2000/svg" style="max-width:700px">
+  <rect width="700" height="520" fill="#1a1a24" rx="8"/>
+
+  <!-- OUTER TRIANGLE: 741 = T(38) — white/light -->
+  <polygon points="350,30 60,470 640,470" fill="none" stroke="#e0ddd4" stroke-width="1.5" opacity="0.6"/>
+  
+  <!-- MIDDLE TRIANGLE: 703 = T(37) — cyan -->
+  <polygon points="350,52 82,450 618,450" fill="none" stroke="#2A8A8A" stroke-width="1.5" opacity="0.7"/>
+  
+  <!-- INNER TRIANGLE: 666 = T(36) — gold -->
+  <polygon points="350,74 104,430 596,430" fill="none" stroke="#C4A45A" stroke-width="1.5" opacity="0.8"/>
+  
+  <!-- Fill zones with subtle transparency -->
+  <polygon points="350,74 104,430 596,430" fill="#C4A45A" opacity="0.06"/>
+  <polygon points="350,52 82,450 618,450" fill="#2A8A8A" opacity="0.04"/>
+  
+  <!-- Dot rows suggestion (sparse) -->
+  <g fill="#e0ddd4" opacity="0.15">
+    <!-- Row hints at top -->
+    <circle cx="350" cy="40" r="2"/>
+    <circle cx="344" cy="55" r="1.5"/><circle cx="356" cy="55" r="1.5"/>
+    <circle cx="338" cy="70" r="1.5"/><circle cx="350" cy="70" r="1.5"/><circle cx="362" cy="70" r="1.5"/>
+  </g>
+  
+  <!-- Labels: INNER -->
+  <text x="350" y="260" text-anchor="middle" font-family="Cinzel,serif" font-size="42" fill="#C4A45A" font-weight="700" opacity="0.5">666</text>
+  <text x="350" y="285" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C4A45A" letter-spacing="3" opacity="0.7">T(36) · THE BEAST</text>
+  <text x="350" y="302" text-anchor="middle" font-family="EB Garamond,serif" font-size="12" fill="#888" font-style="italic">Solar · Sun Square · Inner Core</text>
+  
+  <!-- Labels: MIDDLE band -->
+  <text x="140" y="445" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#2A8A8A" font-weight="600">703</text>
+  <text x="140" y="462" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#2A8A8A" letter-spacing="2">T(37)</text>
+  <text x="140" y="478" text-anchor="middle" font-family="EB Garamond,serif" font-size="11" fill="#2A8A8A" font-style="italic">Yechidah</text>
+
+  <!-- Labels: OUTER band -->
+  <text x="590" y="445" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#e0ddd4" font-weight="600">741</text>
+  <text x="590" y="462" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#e0ddd4" letter-spacing="2">T(38)</text>
+  <text x="590" y="478" text-anchor="middle" font-family="EB Garamond,serif" font-size="11" fill="#ccc" font-style="italic">Lucifer</text>
+
+  <!-- Right side legend -->
+  <g transform="translate(540, 60)">
+    <circle cx="0" cy="0" r="5" fill="#C4A45A" opacity="0.6"/>
+    <text x="14" y="4" font-family="JetBrains Mono,monospace" font-size="10" fill="#C4A45A">T(36) = 666 Therion</text>
+    
+    <circle cx="0" cy="22" r="5" fill="#2A8A8A" opacity="0.6"/>
+    <text x="14" y="26" font-family="JetBrains Mono,monospace" font-size="10" fill="#2A8A8A">T(37) = 703 Yechidah</text>
+    
+    <circle cx="0" cy="44" r="5" fill="#e0ddd4" opacity="0.6"/>
+    <text x="14" y="48" font-family="JetBrains Mono,monospace" font-size="10" fill="#e0ddd4">T(38) = 741 Lucifer</text>
+  </g>
+
+  <!-- The formula at top left -->
+  <g transform="translate(40, 60)">
+    <text x="0" y="0" font-family="JetBrains Mono,monospace" font-size="10" fill="#888">T(n) = n(n+1)/2</text>
+    <text x="0" y="20" font-family="JetBrains Mono,monospace" font-size="10" fill="#C4A45A">T(36) = 36×37/2 = 666</text>
+    <text x="0" y="38" font-family="JetBrains Mono,monospace" font-size="10" fill="#2A8A8A">T(37) = 37×38/2 = 703</text>
+    <text x="0" y="56" font-family="JetBrains Mono,monospace" font-size="10" fill="#e0ddd4">T(38) = 38×39/2 = 741</text>
+  </g>
+
+  <!-- Bottom succession line -->
+  <text x="350" y="500" text-anchor="middle" font-family="EB Garamond,serif" font-size="14" fill="#888" font-style="italic">The lineage of ascent: Beast → Soul → Light-Bearer</text>
+  <text x="350" y="516" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#555" letter-spacing="2">CONSECUTIVE TRIANGULAR NUMBERS · SAME GEOMETRY · ALL POINTED AT NUIT</text>
+</svg>
+</div>
+
+<p style="text-align:center;font-size:14px;color:#888;margin-top:12px">666 nests inside 703, which nests inside 741. Each is exactly one row larger than the last.<br>Three pyramids — the Beast, the Soul, the Heir — aligned, concentric, ascending.</p>
+</div>
+
+<div class="divider">✦ · ✧ · ✦</div>
+
+<!-- FOOTER -->
+<div class="footer">
+<p>One Key. One Method. One Word. Three Values.</p>
+<p style="margin-top:6px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold)">91 · 93 · 741</p>
+<p style="margin-top:6px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--ash)">LIBER אמן SVB FIGVRÂ DCCXLI</p>
+</div>
+
+</div>
+</body>
+</html>
